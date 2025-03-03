@@ -6,7 +6,7 @@ Works with a chat model with tool calling support.
 from datetime import datetime, timezone
 from typing import Dict, List, Literal, cast
 
-from langchain_core.messages import AIMessage
+from langchain_core.messages import AIMessage, HumanMessage, SystemMessage
 from langchain_core.runnables import RunnableConfig
 from langgraph.graph import StateGraph
 from langgraph.prebuilt import ToolNode
@@ -15,9 +15,11 @@ from react_agent.configuration import Configuration
 from react_agent.state import InputState, State
 from react_agent.tools import TOOLS
 from react_agent.utils import load_chat_model
+from langgraph.checkpoint.memory import MemorySaver
+
+memory = MemorySaver()
 
 # Define the function that calls the model
-
 
 async def call_model(
     state: State, config: RunnableConfig
@@ -42,12 +44,13 @@ async def call_model(
     system_message = configuration.system_prompt.format(
         system_time=datetime.now(tz=timezone.utc).isoformat()
     )
+    system_message = SystemMessage(content=system_message)
 
     # Get the model's response
     response = cast(
         AIMessage,
         await model.ainvoke(
-            [{"role": "system", "content": system_message}, *state.messages], config
+            [system_message] + state.messages, config
         ),
     )
 
@@ -117,7 +120,8 @@ builder.add_edge("tools", "call_model")
 # Compile the builder into an executable graph
 # You can customize this by adding interrupt points for state updates
 graph = builder.compile(
+    checkpointer=memory,
     interrupt_before=[],  # Add node names here to update state before they're called
     interrupt_after=[],  # Add node names here to update state after they're called
 )
-graph.name = "ReAct Agent"  # This customizes the name in LangSmith
+graph.name = "Researcher Agent"  # This customizes the name in LangSmith
