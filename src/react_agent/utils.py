@@ -30,7 +30,7 @@ def load_chat_model(fully_specified_name: str) -> BaseChatModel:
     return init_chat_model(model, model_provider=provider)
 '''
 
-def load_chat_model(fully_specified_name: str) -> BaseChatModel:
+def load_chat_model(fully_specified_name: str, temperature: float = 0) -> BaseChatModel:
     """Load a chat model from a fully specified name.
 
     Args:
@@ -42,4 +42,5 @@ def load_chat_model(fully_specified_name: str) -> BaseChatModel:
         api_version=os.getenv("OPENAI_API_VERSION", "2024-02-15-preview"),
         deployment_name=os.getenv("AZURE_OPENAI_DEPLOYMENT_NAME", "gpt-4o"),
         model_name="gpt-4o",
+        temperature=temperature
     )

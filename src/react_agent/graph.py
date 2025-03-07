@@ -122,6 +122,6 @@ builder.add_edge("tools", "call_model")
 graph = builder.compile(
     checkpointer=memory,
     interrupt_before=[],  # Add node names here to update state before they're called
-    interrupt_after=[],  # Add node names here to update state after they're called
+    interrupt_after=[],  # = node names here to update state after they're called
 )
-graph.name = "Researcher Agent"  # This customizes the name in LangSmith
+graph.name = "researcher-agent"  # This customizes the name in LangSmith
